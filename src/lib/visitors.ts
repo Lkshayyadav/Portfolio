@@ -34,10 +34,51 @@ export async function initVisitorTable(): Promise<void> {
   `
 }
 
+/**
+ * Global persistent counter fallback using public CounterAPI microservice
+ * when process.env.DATABASE_URL is not configured.
+ */
+async function trackFallbackVisit(): Promise<number> {
+  try {
+    const res = await fetch('https://api.counterapi.dev/v1/lkshayyadav-portfolio/visits/up', {
+      method: 'GET',
+      cache: 'no-store',
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (typeof data.count === 'number') {
+        return data.count
+      }
+    }
+  } catch (error) {
+    console.error('Fallback counter API error:', error)
+  }
+  return 1
+}
+
+async function getFallbackStats(): Promise<number> {
+  try {
+    const res = await fetch('https://api.counterapi.dev/v1/lkshayyadav-portfolio/visits/', {
+      method: 'GET',
+      cache: 'no-store',
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (typeof data.count === 'number') {
+        return data.count
+      }
+    }
+  } catch (error) {
+    console.error('Fallback counter GET stats error:', error)
+  }
+  return 1
+}
+
 export async function trackVisit(visitorId: string): Promise<VisitorData> {
   const sql = getSql()
   if (!sql) {
-    return { uniqueVisitors: 1 }
+    const fallbackCount = await trackFallbackVisit()
+    return { uniqueVisitors: fallbackCount }
   }
   try {
     await sql`
@@ -50,22 +91,25 @@ export async function trackVisit(visitorId: string): Promise<VisitorData> {
 
     return { uniqueVisitors: uniqueCount }
   } catch (error) {
-    console.error('Error tracking visitor:', error)
-    return { uniqueVisitors: 1 }
+    console.error('Error tracking visitor with DB, attempting fallback:', error)
+    const fallbackCount = await trackFallbackVisit()
+    return { uniqueVisitors: fallbackCount }
   }
 }
 
 export async function getVisitorStats(): Promise<{ uniqueVisitors: number }> {
   const sql = getSql()
   if (!sql) {
-    return { uniqueVisitors: 1 }
+    const count = await getFallbackStats()
+    return { uniqueVisitors: count }
   }
   try {
     const result = await sql`SELECT COUNT(*) as count FROM visitors`
     const uniqueCount = parseInt(result[0]?.count || '1', 10)
     return { uniqueVisitors: uniqueCount }
   } catch (error) {
-    console.error('Error getting visitor stats:', error)
-    return { uniqueVisitors: 1 }
+    console.error('Error getting visitor stats with DB, attempting fallback:', error)
+    const count = await getFallbackStats()
+    return { uniqueVisitors: count }
   }
 }

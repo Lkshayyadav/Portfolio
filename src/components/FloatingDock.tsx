@@ -1,18 +1,31 @@
 'use client'
 
 import { useTheme } from 'next-themes'
-import { Moon, Sun, Calendar, Search, Volume2, VolumeX } from 'lucide-react'
+import { Moon, Sun, Calendar, Search, Volume2, VolumeX, ArrowUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { SOCIALS, PERSONAL } from '@/lib/config'
 import { useSoundFX } from '@/hooks/useSoundFX'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function FloatingDock() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [showScrollTop, setShowScrollTop] = useState(false)
   const { soundEnabled, toggleSound, playHover, playToggle, playClick } = useSoundFX()
 
   useEffect(() => {
     setMounted(true)
+
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true)
+      } else {
+        setShowScrollTop(false)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   if (!mounted) return null
@@ -28,8 +41,35 @@ export default function FloatingDock() {
     document.dispatchEvent(event)
   }
 
+  const scrollToTop = () => {
+    playClick()
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    })
+  }
+
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 items-center">
+      {/* Scroll To Top Button — Positioned safely at top of dock stack */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 10 }}
+            transition={{ duration: 0.2 }}
+            onClick={scrollToTop}
+            onMouseEnter={playHover}
+            className="w-10 h-10 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+            aria-label="Scroll to top"
+            title="Scroll to Top"
+          >
+            <ArrowUp className="w-4 h-4" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Command Palette Button */}
       <button
         onClick={triggerCmdK}

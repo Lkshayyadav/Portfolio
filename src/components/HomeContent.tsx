@@ -4,8 +4,6 @@ import Link from 'next/link'
 import DiagonalPattern from './DiagonalPattern'
 import BannerSection from './BannerSection'
 import ProfileHeader from './ProfileHeader'
-import ContentSection from './ContentSection'
-import ContentParagraph from './ContentParagraph'
 import SectionBorder from './SectionBorder'
 import ExperienceContent from './ExperienceContent'
 import Reachout from './Reachout'
@@ -49,31 +47,6 @@ export default function HomeContent() {
           {/* Content Prose */}
           <div className="prose dark:prose-invert max-w-none">
             <div className="text-base">
-              {/* Current Role Section */}
-              <Reveal delay={0.1}>
-                <ContentSection
-                  subtitle={PERSONAL.title}
-                  title=""
-                  className="mt-6"
-                >
-                  <div></div>
-                </ContentSection>
-              </Reveal>
-
-              <Reveal delay={0.05}>
-                <SectionBorder className="mt-6" />
-              </Reveal>
-
-              {/* About / Bio Section */}
-              <Reveal delay={0.1}>
-                <ContentSection className="pb-6 sm:pb-8 pt-4 sm:pt-6 px-2 sm:px-0">
-                  <ContentParagraph className="mb-4 text-base sm:text-lg">
-                    {PERSONAL.bio}
-                  </ContentParagraph>
-
-                </ContentSection>
-              </Reveal>
-
               <Reveal delay={0.05}>
                 <SectionBorder className="mt-6" />
               </Reveal>

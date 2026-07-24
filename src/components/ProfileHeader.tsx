@@ -31,14 +31,13 @@ export default function ProfileHeader() {
         </div>
       </div>
 
-      {/* Inline Tech Bio Paragraph */}
+      {/* Inline Tech Bio Paragraph with Badges & Underline (CEX removed) */}
       <div className="text-sm sm:text-base leading-relaxed text-neutral-700 dark:text-neutral-300">
         I&apos;m a{' '}
         <span className="font-semibold underline decoration-neutral-400 underline-offset-4">
           Full Stack Developer
         </span>{' '}
-        building high-performance applications like{' '}
-        <span className="font-semibold">CEX</span>. I use{' '}
+        building high-performance, scalable applications. I use{' '}
         <span className="inline-flex items-center gap-1 font-medium bg-neutral-200/80 dark:bg-neutral-800/80 px-2 py-0.5 rounded-md text-xs sm:text-sm text-neutral-900 dark:text-neutral-100 border border-neutral-300/50 dark:border-neutral-700/50">
           <Image src="/tech-icons/react.svg" alt="React" width={14} height={14} className="w-3.5 h-3.5 inline" unoptimized /> React
         </span>{' '}

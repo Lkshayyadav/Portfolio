@@ -2,8 +2,8 @@
  * ============================================================
  *  PORTFOLIO CONFIGURATION — Single Source of Truth
  * ============================================================
- *  Edit this file to update all portfolio content.
- *  No other files need to be touched for content changes.
+ *  Edit this file or files inside /src/data/ to update content.
+ *  No UI code needs to be touched for content changes.
  *
  *  Asset paths (relative to /public):
  *    Profile photo      →  /assets/images/profile/profile.jpg
@@ -16,6 +16,20 @@
  * ============================================================
  */
 
+import {
+  HERO_BIO,
+  CLOSING_BIO,
+  HERO_TITLE,
+  BANNER_QUOTE,
+  CTA_QUOTE,
+  CTA_QUOTE_AUTHOR,
+  CTA_TEXT,
+  CTA_URL,
+  CTA_PRE_TEXT,
+} from '@/data/bio'
+import { aboutData } from '@/data/about'
+import { socialsData } from '@/data/socials'
+
 // ─── Personal Info ────────────────────────────────────────────────────────────
 
 export const PERSONAL = {
@@ -24,21 +38,21 @@ export const PERSONAL = {
   /** Shown beneath the name in the profile header */
   age: '21',
   /** Sub-line shown next to age */
-  title: 'Full-Stack Developer • Backend Engineer • Open Source',
-  /** Hero / about intro paragraph */
-  bio: `I build full-stack applications that solve real problems — from a high-performance
-centralized exchange matching engine to open-source tools. I work across the entire stack:
-React, Next.js, Node.js, PostgreSQL, Redis, and WebSockets. Currently exploring Generative AI and DevOps.`,
+  title: HERO_TITLE,
+  /** Hero intro paragraph — focuses on Who I Am & Dev background */
+  bio: HERO_BIO,
+  /** Closing paragraph — focuses on goals, philosophy & opportunities */
+  closingBio: CLOSING_BIO,
   /** Short quote shown on the banner image */
-  bannerQuote: 'Build things that matter. Ship things that work.',
+  bannerQuote: BANNER_QUOTE,
   /** Quote shown in the CTA section */
-  ctaQuote: '"Man is made by his belief. As he believes, so he is."',
-  ctaQuoteAuthor: '— Bhagavad Gita',
+  ctaQuote: CTA_QUOTE,
+  ctaQuoteAuthor: CTA_QUOTE_AUTHOR,
   /** CTA button text and link */
-  ctaText: 'Schedule a Call',
-  ctaUrl: 'mailto:lakshayyadav1010@gmail.com',
-  /** Text shown above CTA button */
-  ctaPreText: "If you've read this far, you might be interested in working together.",
+  ctaText: CTA_TEXT,
+  ctaUrl: CTA_URL,
+  /** Text shown above CTA button / closing section */
+  ctaPreText: CTA_PRE_TEXT,
   /** Meta description for SEO / OG cards */
   metaDescription:
     'Portfolio of Lakshay Yadav — Full-Stack Developer, Backend Engineer, and Open Source contributor. B.Tech CSE student building production-grade applications.',
@@ -57,19 +71,11 @@ React, Next.js, Node.js, PostgreSQL, Redis, and WebSockets. Currently exploring 
   resumeDownloadName: 'Lakshay_Yadav_Resume.pdf',
   /** OpenGraph / Twitter card image */
   ogImage: '/assets/images/profile/og-image.png',
-};
+}
 
 // ─── Social Links ─────────────────────────────────────────────────────────────
 
-export const SOCIALS = {
-  github: 'https://github.com/Lkshayyadav',
-  linkedin: 'https://www.linkedin.com/in/lakshay-yadav-7141532a9/',
-  twitter: 'https://x.com/LakshayYadav21',
-  email: 'mailto:lakshayyadav1010@gmail.com',
-  linktree: 'https://linktr.ee/lkshayyadav',
-  /** Set to empty string '' to hide the resume link in the nav */
-  resume: '/assets/resume/resume.pdf',
-};
+export const SOCIALS = socialsData
 
 // ─── Typing Words (hero subtitle animation) ────────────────────────────────────
 
@@ -78,9 +84,7 @@ export const TYPING_WORDS = [
   'Backend Engineer',
   'Open Source Contributor',
   'AI Practitioner',
-];
-
-// ─── Tech Stack Marquee ───────────────────────────────────────────────────────
+]
 
 // ─── Tech Stack Marquee ───────────────────────────────────────────────────────
 
@@ -121,96 +125,22 @@ export const TECH_STACK = [
   // Concepts & Real-time
   { name: 'WebSockets', category: 'concept', icon: 'https://raw.githubusercontent.com/devicons/devicon/master/icons/socketio/socketio-original.svg' },
   { name: 'WebRTC', category: 'concept', icon: 'https://raw.githubusercontent.com/devicons/devicon/master/icons/webrtc/webrtc-original.svg' },
-];
+]
 
 // ─── About Section ────────────────────────────────────────────────────────────
 
-export const ABOUT = {
-  /** Short bio shown in the about card */
-  bio: `I'm a Full Stack Developer and B.Tech CSE student focused on JavaScript, TypeScript, C++, React, Next.js, Node.js, Express.js, MongoDB, PostgreSQL, and building scalable full-stack applications.`,
-  /** Skills shown as icon grid in the about card */
-  skills: [
-    {
-      name: 'JavaScript',
-      icon: '/tech-icons/javascript.svg',
-    },
-    {
-      name: 'TypeScript',
-      icon: '/tech-icons/typescript.svg',
-    },
-    {
-      name: 'C++',
-      icon: 'https://raw.githubusercontent.com/devicons/devicon/master/icons/cplusplus/cplusplus-original.svg',
-    },
-    {
-      name: 'React.js',
-      icon: '/tech-icons/react.svg',
-    },
-    {
-      name: 'Next.js',
-      icon: '/tech-icons/nextjs.svg',
-    },
-    {
-      name: 'Tailwind CSS',
-      icon: '/tech-icons/tailwind.svg',
-    },
-    {
-      name: 'Framer Motion',
-      icon: 'https://raw.githubusercontent.com/devicons/devicon/master/icons/framermotion/framermotion-original.svg',
-    },
-    {
-      name: 'Node.js',
-      icon: '/tech-icons/nodejs.svg',
-    },
-    {
-      name: 'Express.js',
-      icon: '/tech-icons/express.svg',
-    },
-    {
-      name: 'MongoDB',
-      icon: '/tech-icons/mongodb.svg',
-    },
-    {
-      name: 'PostgreSQL',
-      icon: '/tech-icons/postgresql.svg',
-    },
-    {
-      name: 'Prisma ORM',
-      icon: '/tech-icons/prisma.svg',
-    },
-    {
-      name: 'Git',
-      icon: '/tech-icons/Git.svg',
-    },
-    {
-      name: 'Postman',
-      icon: 'https://raw.githubusercontent.com/devicons/devicon/master/icons/postman/postman-original.svg',
-    },
-    {
-      name: 'Turborepo',
-      icon: 'https://raw.githubusercontent.com/devicons/devicon/master/icons/turborepo/turborepo-original.svg',
-    },
-    {
-      name: 'Vercel',
-      icon: 'https://raw.githubusercontent.com/devicons/devicon/master/icons/vercel/vercel-original.svg',
-    },
-    {
-      name: 'Render',
-      icon: 'https://raw.githubusercontent.com/devicons/devicon/master/icons/render/render-original.svg',
-    },
-  ],
-};
+export const ABOUT = aboutData
 
 // ─── Experience ───────────────────────────────────────────────────────────────
 
 export interface ExperienceItem {
-  company: string;
-  position: string;
-  duration: string;
-  description: string;
-  achievements?: string[];
-  href?: string;
-  logoUrl?: string;
+  company: string
+  position: string
+  duration: string
+  description: string
+  achievements?: string[]
+  href?: string
+  logoUrl?: string
 }
 
 export const EXPERIENCE: ExperienceItem[] = [
@@ -227,23 +157,23 @@ export const EXPERIENCE: ExperienceItem[] = [
     href: 'https://www.linkedin.com/company/prodigy-infotech/',
     logoUrl: '/assets/images/experience/prodigy.png',
   },
-];
+]
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
 
 export interface Project {
-  id: string;
-  title: string;
-  description: string;
-  longDescription: string;
-  liveLink?: string;
-  githubLink?: string;
-  image: string;
-  screenshots?: string[];
-  tags: string[];
-  features?: string[];
-  date?: string;
-  status?: string;
+  id: string
+  title: string
+  description: string
+  longDescription: string
+  liveLink?: string
+  githubLink?: string
+  image: string
+  screenshots?: string[]
+  tags: string[]
+  features?: string[]
+  date?: string
+  status?: string
 }
 
 export const PROJECTS: Project[] = [
@@ -339,14 +269,14 @@ and trade feed, Prisma + PostgreSQL for persistence, and JWT-based authenticatio
     status: 'Completed',
     features: ['Live Repo Insights', 'Gemini AI code highlights', 'Portia AI security & architecture review', 'Repo comparison mode'],
   },
-];
+]
 
 // ─── Thoughts / FAQs ──────────────────────────────────────────────────────────
 
 export interface Thought {
-  id: string;
-  question: string;
-  answer: string;
+  id: string
+  question: string
+  answer: string
 }
 
 export const THOUGHTS: Thought[] = [
@@ -367,7 +297,7 @@ When I admit what broke, I learn what actually went wrong.`,
 I use AI for exploring approaches, writing boilerplate, and stress-testing ideas.
 If I can't explain a piece of code in simple words, it doesn't go into production.`,
   },
-];
+]
 
 // ─── Spotify / Music Player ───────────────────────────────────────────────────
 
@@ -378,15 +308,15 @@ export const MUSIC = {
   songName: 'Song Name',
   artists: 'Artist Name',
   audioSrc: '',
-};
+}
 
 // ─── Sound Effects ────────────────────────────────────────────────────────────
 
-export const SOUNDS_ENABLED = false;
+export const SOUNDS_ENABLED = false
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 export const FOOTER = {
   credit: 'Made with ♡ by Lakshay Yadav',
   year: '2026',
-};
+}
