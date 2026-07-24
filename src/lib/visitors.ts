@@ -74,25 +74,27 @@ async function getFallbackStats(): Promise<number> {
   return 1
 }
 
-export async function trackVisit(visitorId: string): Promise<VisitorData> {
+export async function trackVisit(visitorId: string, isNewVisitor: boolean = true): Promise<VisitorData> {
   const sql = getSql()
   if (!sql) {
-    const fallbackCount = await trackFallbackVisit()
+    const fallbackCount = isNewVisitor ? await trackFallbackVisit() : await getFallbackStats()
     return { uniqueVisitors: fallbackCount }
   }
   try {
-    await sql`
-      INSERT INTO visitors (visitor_id)
-      VALUES (${visitorId})
-      ON CONFLICT (visitor_id) DO NOTHING
-    `
+    if (isNewVisitor) {
+      await sql`
+        INSERT INTO visitors (visitor_id)
+        VALUES (${visitorId})
+        ON CONFLICT (visitor_id) DO NOTHING
+      `
+    }
     const result = await sql`SELECT COUNT(*) as count FROM visitors`
     const uniqueCount = parseInt(result[0]?.count || '1', 10)
 
     return { uniqueVisitors: uniqueCount }
   } catch (error) {
     console.error('Error tracking visitor with DB, attempting fallback:', error)
-    const fallbackCount = await trackFallbackVisit()
+    const fallbackCount = isNewVisitor ? await trackFallbackVisit() : await getFallbackStats()
     return { uniqueVisitors: fallbackCount }
   }
 }

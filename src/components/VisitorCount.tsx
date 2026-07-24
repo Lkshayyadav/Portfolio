@@ -8,6 +8,8 @@ interface VisitorStats {
   uniqueVisitors: number
 }
 
+const VISITED_KEY = 'portfolio_visited_device_v1'
+
 export function VisitorCount({ className }: { className?: string }) {
   const [stats, setStats] = useState<VisitorStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -16,24 +18,33 @@ export function VisitorCount({ className }: { className?: string }) {
     async function trackAndFetchStats() {
       try {
         const fingerprint = getOrCreateVisitorId()
+        const hasVisitedBefore = typeof window !== 'undefined' && localStorage.getItem(VISITED_KEY) === 'true'
 
-        const postRes = await fetch('/api/visitors', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ fingerprint }),
-          cache: 'no-store',
-        })
+        if (!hasVisitedBefore) {
+          // First time opening the portfolio on this device! Mark visited & increment count
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(VISITED_KEY, 'true')
+          }
 
-        if (postRes.ok) {
-          const data = await postRes.json()
-          if (data.uniqueVisitors !== undefined) {
-            setStats({ uniqueVisitors: data.uniqueVisitors })
-            return
+          const postRes = await fetch('/api/visitors', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fingerprint, isNewVisitor: true }),
+            cache: 'no-store',
+          })
+
+          if (postRes.ok) {
+            const data = await postRes.json()
+            if (data.uniqueVisitors !== undefined) {
+              setStats({ uniqueVisitors: data.uniqueVisitors })
+              return
+            }
           }
         }
 
+        // Returning visitor on this device — fetch stats without incrementing count
         const response = await fetch('/api/visitors', {
           method: 'GET',
           cache: 'no-store',

@@ -20,13 +20,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}))
     const fingerprint = body.fingerprint as string | undefined
+    const isNewVisitor = body.isNewVisitor !== false
     
     const headersList = await headers()
     const userAgent = headersList.get('user-agent')
     const ip = getClientIP(request)
     
     const visitorId = generateVisitorId(ip, userAgent, fingerprint)
-    const data = await trackVisit(visitorId)
+    const data = await trackVisit(visitorId, isNewVisitor)
     
     return NextResponse.json({
       success: true,
@@ -66,4 +67,3 @@ export async function GET() {
     }, { status: 500 })
   }
 }
-

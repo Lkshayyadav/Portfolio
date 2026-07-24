@@ -1,9 +1,9 @@
 'use client'
 
 import { useTheme } from 'next-themes'
-import { Moon, Sun, Calendar, Search, Volume2, VolumeX, ArrowUp } from 'lucide-react'
+import { Moon, Sun, Search, Volume2, VolumeX, ArrowUp, Mail } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { SOCIALS, PERSONAL } from '@/lib/config'
+import { SOCIALS } from '@/lib/config'
 import { useSoundFX } from '@/hooks/useSoundFX'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -49,9 +49,11 @@ export default function FloatingDock() {
     })
   }
 
+  const emailHref = SOCIALS.email.startsWith('mailto:') ? SOCIALS.email : `mailto:${SOCIALS.email}`
+
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 items-center">
-      {/* Scroll To Top Button — Positioned safely at top of dock stack */}
+    <div className="fixed bottom-8 right-5 z-[999] flex flex-col gap-3 items-center">
+      {/* Scroll To Top Button — Safely atop the dock */}
       <AnimatePresence>
         {showScrollTop && (
           <motion.button
@@ -61,7 +63,7 @@ export default function FloatingDock() {
             transition={{ duration: 0.2 }}
             onClick={scrollToTop}
             onMouseEnter={playHover}
-            className="w-10 h-10 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+            className="w-10 h-10 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all border border-neutral-700 dark:border-neutral-300"
             aria-label="Scroll to top"
             title="Scroll to Top"
           >
@@ -74,7 +76,7 @@ export default function FloatingDock() {
       <button
         onClick={triggerCmdK}
         onMouseEnter={playHover}
-        className="w-10 h-10 rounded-full bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border border-neutral-300 dark:border-neutral-800 shadow-lg flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:scale-105 active:scale-95 transition-all"
+        className="w-10 h-10 rounded-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-xl flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:scale-105 active:scale-95 transition-all"
         aria-label="Search Command Palette (Ctrl+K)"
         title="Search & Commands (Ctrl+K)"
       >
@@ -88,7 +90,7 @@ export default function FloatingDock() {
           setTheme(theme === 'light' ? 'dark' : 'light')
         }}
         onMouseEnter={playHover}
-        className="w-10 h-10 rounded-full bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border border-neutral-300 dark:border-neutral-800 shadow-lg flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:scale-105 active:scale-95 transition-all"
+        className="w-10 h-10 rounded-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-xl flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:scale-105 active:scale-95 transition-all"
         aria-label="Toggle theme"
         title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
       >
@@ -105,7 +107,7 @@ export default function FloatingDock() {
           toggleSound()
         }}
         onMouseEnter={playHover}
-        className="w-10 h-10 rounded-full bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border border-neutral-300 dark:border-neutral-800 shadow-lg flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:scale-105 active:scale-95 transition-all"
+        className="w-10 h-10 rounded-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-xl flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:scale-105 active:scale-95 transition-all"
         aria-label="Toggle sound effects"
         title={soundEnabled ? 'Disable UI Sound FX' : 'Enable UI Sound FX'}
       >
@@ -116,18 +118,16 @@ export default function FloatingDock() {
         )}
       </button>
 
-      {/* Schedule / Book Call Button */}
+      {/* Direct Email Contact Button */}
       <a
-        href={PERSONAL.ctaUrl || SOCIALS.email}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={emailHref}
         onMouseEnter={playHover}
         onClick={playClick}
-        className="w-10 h-10 rounded-full bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border border-neutral-300 dark:border-neutral-800 shadow-lg flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:scale-105 active:scale-95 transition-all"
-        title="Schedule a Call"
-        aria-label="Schedule a Call"
+        className="w-10 h-10 rounded-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 shadow-xl flex items-center justify-center text-neutral-800 dark:text-neutral-200 hover:scale-105 active:scale-95 transition-all"
+        title="Send an Email"
+        aria-label="Send an Email"
       >
-        <Calendar className="w-4 h-4 text-purple-400" />
+        <Mail className="w-4 h-4 text-purple-400" />
       </a>
     </div>
   )
