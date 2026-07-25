@@ -17,9 +17,18 @@ interface GitHubActivityProps {
     username?: string
 }
 
+interface ApiData {
+    total: Record<string, number>
+    contributions: ContributionDay[]
+}
+
 export default function GitHubActivity({ username = PERSONAL.githubUsername }: GitHubActivityProps) {
+    const [rawApiData, setRawApiData] = useState<ApiData | null>(null)
+    const [availableYears, setAvailableYears] = useState<string[]>([])
+    const [selectedYear, setSelectedYear] = useState<string>('')
     const [contributions, setContributions] = useState<ContributionWeek[]>([])
     const [totalContributions, setTotalContributions] = useState(0)
+    const [allTimeTotal, setAllTimeTotal] = useState(0)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -28,84 +37,31 @@ export default function GitHubActivity({ username = PERSONAL.githubUsername }: G
             try {
                 setLoading(true)
 
-                // Fetch contributions for 2025 and 2026
-                const [response2025, response2026] = await Promise.all([
-                    fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=2025`),
-                    fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=2026`)
-                ])
-
-                if (!response2025.ok || !response2026.ok) {
+                // Fetch all contribution data for username
+                const response = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}`)
+                if (!response.ok) {
                     throw new Error('Failed to fetch contributions')
                 }
 
-                const data2025 = await response2025.json()
-                const data2026 = await response2026.json()
+                const data: ApiData = await response.json()
+                setRawApiData(data)
 
-                // Combine and filter: Feb 2025 to Jan 2026
-                const allContributions: { date: string; count: number; level: number }[] = []
+                if (data.total) {
+                    // Calculate all-time total contributions across all available years
+                    const overallTotal = Object.values(data.total).reduce((sum, count) => sum + count, 0)
+                    setAllTimeTotal(overallTotal)
 
-                // Add 2025 contributions from February onwards
-                if (data2025.contributions) {
-                    data2025.contributions.forEach((day: { date: string; count: number; level: number }) => {
-                        const date = new Date(day.date)
-                        if (date.getMonth() >= 1) { // February = 1
-                            allContributions.push(day)
-                        }
-                    })
-                }
+                    // Extract available years sorted descending (e.g. 2026, 2025, 2024)
+                    const years = Object.keys(data.total).sort((a, b) => Number(b) - Number(a))
+                    setAvailableYears(years)
 
-                // Add 2026 contributions (January only, up to current date)
-                if (data2026.contributions) {
-                    data2026.contributions.forEach((day: { date: string; count: number; level: number }) => {
-                        const date = new Date(day.date)
-                        if (date.getMonth() === 0) { // January = 0
-                            allContributions.push(day)
-                        }
-                    })
-                }
-
-                const weeks: ContributionWeek[] = []
-                let currentWeek: ContributionDay[] = []
-                let total = 0
-                let isFirstDay = true
-
-                allContributions.forEach((day) => {
-                    const date = new Date(day.date)
-                    const dayOfWeek = date.getDay()
-
-                    // For the first day, pad the week with empty days if it doesn't start on Sunday
-                    if (isFirstDay && dayOfWeek !== 0) {
-                        for (let i = 0; i < dayOfWeek; i++) {
-                            currentWeek.push({
-                                date: '',
-                                count: 0,
-                                level: 0
-                            })
-                        }
-                        isFirstDay = false
+                    // Default to latest year available
+                    if (years.length > 0) {
+                        setSelectedYear(years[0])
+                    } else {
+                        setSelectedYear(String(new Date().getFullYear()))
                     }
-                    isFirstDay = false
-
-                    if (dayOfWeek === 0 && currentWeek.length > 0) {
-                        weeks.push({ contributionDays: currentWeek })
-                        currentWeek = []
-                    }
-
-                    currentWeek.push({
-                        date: day.date,
-                        count: day.count,
-                        level: day.level
-                    })
-
-                    total += day.count
-                })
-
-                if (currentWeek.length > 0) {
-                    weeks.push({ contributionDays: currentWeek })
                 }
-
-                setContributions(weeks)
-                setTotalContributions(total)
                 setError(null)
             } catch (err) {
                 setError('Failed to load GitHub activity')
@@ -117,6 +73,58 @@ export default function GitHubActivity({ username = PERSONAL.githubUsername }: G
 
         fetchContributions()
     }, [username])
+
+    // Update contribution grid whenever selectedYear or rawApiData changes
+    useEffect(() => {
+        if (!rawApiData || !selectedYear) return
+
+        const yearDays = rawApiData.contributions.filter((day) =>
+            day.date.startsWith(selectedYear)
+        )
+
+        const weeks: ContributionWeek[] = []
+        let currentWeek: ContributionDay[] = []
+        let total = 0
+        let isFirstDay = true
+
+        yearDays.forEach((day) => {
+            const date = new Date(day.date)
+            const dayOfWeek = date.getDay()
+
+            // For the first day, pad the week with empty days if it doesn't start on Sunday
+            if (isFirstDay && dayOfWeek !== 0) {
+                for (let i = 0; i < dayOfWeek; i++) {
+                    currentWeek.push({
+                        date: '',
+                        count: 0,
+                        level: 0
+                    })
+                }
+            }
+            isFirstDay = false
+
+            if (dayOfWeek === 0 && currentWeek.length > 0) {
+                weeks.push({ contributionDays: currentWeek })
+                currentWeek = []
+            }
+
+            currentWeek.push({
+                date: day.date,
+                count: day.count,
+                level: day.level
+            })
+
+            total += day.count
+        })
+
+        if (currentWeek.length > 0) {
+            weeks.push({ contributionDays: currentWeek })
+        }
+
+        setContributions(weeks)
+        // Use total count from API for selected year or calculated sum
+        setTotalContributions(rawApiData.total[selectedYear] ?? total)
+    }, [selectedYear, rawApiData])
 
     const getContributionColor = (level: number) => {
         const colors = {
@@ -145,21 +153,19 @@ export default function GitHubActivity({ username = PERSONAL.githubUsername }: G
 
         const labels: { month: string; position: number }[] = []
         let currentMonth = -1
-        let lastLabelPosition = -10 // Ensure first label always shows
+        let lastLabelPosition = -10
 
         contributions.forEach((week, weekIndex) => {
-            // Find a day with a valid date in this week
-            const validDay = week.contributionDays.find(day => day.date !== '')
+            const validDay = week.contributionDays.find((day) => day.date !== '')
             if (validDay) {
                 const date = new Date(validDay.date)
                 const month = date.getMonth()
 
-                // Always add the first month, then check spacing for others
                 if (currentMonth === -1) {
                     currentMonth = month
                     labels.push({ month: months[month], position: weekIndex })
                     lastLabelPosition = weekIndex
-                } else if (month !== currentMonth && weekIndex - lastLabelPosition >= 4) {
+                } else if (month !== currentMonth && weekIndex - lastLabelPosition >= 3) {
                     currentMonth = month
                     labels.push({ month: months[month], position: weekIndex })
                     lastLabelPosition = weekIndex
@@ -178,10 +184,12 @@ export default function GitHubActivity({ username = PERSONAL.githubUsername }: G
     if (loading) {
         return (
             <div className="w-full">
-                <div className="mb-4">
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Featured</p>
-                    <h3 className="text-xl font-semibold text-black dark:text-white mb-1">GitHub Activity</h3>
-                    <div className="h-4 w-40 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse" />
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-4">
+                    <div>
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Featured</p>
+                        <h3 className="text-xl font-semibold text-black dark:text-white mb-1">GitHub Activity</h3>
+                        <div className="h-4 w-40 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse" />
+                    </div>
                 </div>
                 <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 sm:p-6">
                     <div className="grid grid-cols-[repeat(53,1fr)] gap-[2px]">
@@ -217,20 +225,42 @@ export default function GitHubActivity({ username = PERSONAL.githubUsername }: G
 
     return (
         <div className="w-full">
-            <div className="mb-4">
-                <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Featured</p>
-                <h3 className="text-xl font-semibold text-black dark:text-white mb-1">GitHub Activity</h3>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Total: <span className="font-semibold text-black dark:text-white">{totalContributions.toLocaleString()}</span> contributions
-                </p>
+            {/* Header with Year Selector */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4">
+                <div>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-1">Featured</p>
+                    <h3 className="text-xl font-semibold text-black dark:text-white mb-1">GitHub Activity</h3>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                        Total: <span className="font-semibold text-black dark:text-white">{allTimeTotal.toLocaleString()}</span> contributions <span className="text-neutral-400 dark:text-neutral-500 font-normal">({totalContributions.toLocaleString()} in {selectedYear})</span>
+                    </p>
+                </div>
+
+                {/* Year Selector Pills */}
+                {availableYears.length > 0 && (
+                    <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800/70 p-1 rounded-lg border border-neutral-200 dark:border-neutral-700/60 self-start sm:self-auto">
+                        {availableYears.map((year) => (
+                            <button
+                                key={year}
+                                onClick={() => setSelectedYear(year)}
+                                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                                    selectedYear === year
+                                        ? 'bg-white dark:bg-neutral-700 text-black dark:text-white shadow-sm font-semibold'
+                                        : 'text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white'
+                                }`}
+                            >
+                                {year}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div
                 className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 sm:p-6 shadow-sm"
                 role="img"
-                aria-label={`GitHub contribution graph showing ${totalContributions} contributions in the last year`}
+                aria-label={`GitHub contribution graph showing ${totalContributions} contributions in ${selectedYear}`}
             >
-                {/* Month labels - responsive positioning */}
+                {/* Month labels */}
                 <div className="relative mb-2">
                     <div
                         className="grid text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400"
@@ -258,14 +288,20 @@ export default function GitHubActivity({ username = PERSONAL.githubUsername }: G
                             {week.contributionDays.map((day, dayIndex) => (
                                 <div
                                     key={dayIndex}
-                                    className={`aspect-square w-full rounded-[2px] transition-colors ${getContributionColor(day.level)}`}
-                                    title={`${day.count} contributions on ${new Date(day.date).toLocaleDateString('en-US', {
-                                        weekday: 'short',
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric'
-                                    })}`}
-                                    aria-label={`${day.count} contributions on ${day.date}`}
+                                    className={`aspect-square w-full rounded-[2px] transition-colors ${
+                                        day.date ? getContributionColor(day.level) : 'bg-transparent'
+                                    }`}
+                                    title={
+                                        day.date
+                                            ? `${day.count} contributions on ${new Date(day.date).toLocaleDateString('en-US', {
+                                                  weekday: 'short',
+                                                  month: 'short',
+                                                  day: 'numeric',
+                                                  year: 'numeric'
+                                              })}`
+                                            : undefined
+                                    }
+                                    aria-label={day.date ? `${day.count} contributions on ${day.date}` : undefined}
                                 />
                             ))}
                         </div>
