@@ -282,6 +282,28 @@ and trade feed, Prisma + PostgreSQL for persistence, and JWT-based authenticatio
     status: 'Completed',
     features: ['Live Repo Insights', 'Gemini AI code highlights', 'Portia AI security & architecture review', 'Repo comparison mode'],
   },
+  {
+    id: 'portfolio',
+    title: 'Developer Portfolio — Interactive Workspace',
+    description:
+      'A modern, interactive developer portfolio built with Next.js, TypeScript, Tailwind CSS, Framer Motion, and custom UI components.',
+    longDescription:
+      'A high-performance personal portfolio website featuring interactive dot grid canvas background, custom sound FX, GitHub activity calendar, dark mode, interactive command palette, and bio configuration engine.',
+    liveLink: 'https://lakshayyadav.dev',
+    githubLink: 'https://github.com/Lkshayyadav/Portfolio',
+    image: '/assets/projects/portfolio/dashboard.png',
+    screenshots: ['/assets/projects/portfolio/dashboard.png'],
+    tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'React'],
+    date: '2026',
+    status: 'Completed',
+    features: [
+      'Interactive dot-grid background canvas',
+      'Custom Web Audio sound FX engine',
+      'Real-time GitHub contribution activity calendar',
+      'Configurable command palette modal',
+      'Dark mode theme switcher',
+    ],
+  },
 ]
 
 // ─── Thoughts / FAQs ──────────────────────────────────────────────────────────
