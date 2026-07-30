@@ -145,6 +145,19 @@ export interface ExperienceItem {
 
 export const EXPERIENCE: ExperienceItem[] = [
   {
+    company: 'Validd',
+    position: 'Full Stack Developer Intern',
+    duration: 'Jun 2026 – Present',
+    description:
+      'Contributed to frontend and backend development of a production fintech platform using React, React Native, TypeScript, Node.js, and Supabase.',
+    achievements: [
+      'Contributed to frontend and backend development of a production fintech platform using React, React Native, TypeScript, Node.js, and Supabase.',
+      'Performed end-to-end testing, identified bugs, verified fixes, and collaborated with engineers to improve application quality and release stability.',
+      'Worked across multiple Git repositories, documented feature updates and bug fixes, and assisted with development workflows and release validation.',
+    ],
+    logoUrl: '/assets/images/experience/validd.png',
+  },
+  {
     company: 'Prodigy InfoTech',
     position: 'Web Development Intern',
     duration: '2024',

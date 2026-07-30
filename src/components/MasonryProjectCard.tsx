@@ -24,7 +24,13 @@ export const MasonryProjectCard = ({ project, className = "" }: MasonryProjectCa
     >
       <div className="flex flex-col gap-3">
         {/* Top Thumbnail Image */}
-        <div className="relative overflow-hidden rounded-xl w-full aspect-[16/10] bg-neutral-100 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800/60 group">
+        <Link
+          href={liveTarget}
+          target={liveTarget.startsWith('http') ? '_blank' : undefined}
+          rel={liveTarget.startsWith('http') ? 'noopener noreferrer' : undefined}
+          onClick={playClick}
+          className="relative overflow-hidden rounded-xl w-full aspect-[16/10] bg-neutral-100 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800/60 group block"
+        >
           {project.image ? (
             <Image
               src={project.image}
@@ -45,13 +51,21 @@ export const MasonryProjectCard = ({ project, className = "" }: MasonryProjectCa
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>{project.status || 'Completed'}</span>
           </div>
-        </div>
+        </Link>
 
         {/* Title & Date Row */}
         <div className="flex items-start justify-between gap-2 pt-1">
-          <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
-            {project.title}
-          </h3>
+          <Link
+            href={liveTarget}
+            target={liveTarget.startsWith('http') ? '_blank' : undefined}
+            rel={liveTarget.startsWith('http') ? 'noopener noreferrer' : undefined}
+            onClick={playClick}
+            className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
+          >
+            <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
+              {project.title}
+            </h3>
+          </Link>
           {project.date && (
             <span className="text-xs text-neutral-500 dark:text-neutral-400 font-mono shrink-0 mt-0.5">
               {project.date}

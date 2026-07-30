@@ -17,9 +17,14 @@ interface ProjectCardProps {
 export const ProjectCard = ({ project, isDetailed = false, allProjects = [] }: ProjectCardProps) => {
 
   if (!isDetailed) {
+    const targetUrl = project.liveLink || project.githubLink || `/projects/${project.id}`;
+    const isExternal = targetUrl.startsWith('http');
+
     return (
       <Link
-        href={`/projects/${project.id}`}
+        href={targetUrl}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
         className="group block touch-manipulation active:opacity-75"
         style={{
           WebkitTapHighlightColor: 'transparent',
